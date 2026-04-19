@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plain.CO — Plain and Simple</title>
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0b0b0a;--bg2:#131311;--bg3:#1a1a17;
+      --cream:#f0ead8;--gold:#c9a96e;--gold2:#e8d5a3;
+      --mid:#5c5850;--line:rgba(240,234,216,0.09);--red:#c0392b;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--cream);font-family:'Syne',sans-serif;font-weight:400;overflow-x:hidden;cursor:none}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.028;pointer-events:none;z-index:9998}
+    .cursor{position:fixed;width:9px;height:9px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    .cursor-ring{position:fixed;width:34px;height:34px;border:1px solid rgba(201,169,110,.45);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .35s ease,height .35s ease,opacity .3s}
+    .cursor.hv{width:0;height:0}.cursor-ring.hv{width:56px;height:56px;opacity:.6}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px 52px;z-index:500;transition:all .3s}
+    nav.scrolled{backdrop-filter:blur(20px) saturate(150%);background:rgba(11,11,10,.88);padding:16px 52px;border-bottom:1px solid var(--line)}
+    .logo{text-decoration:none;display:flex;flex-direction:column;gap:2px;position:relative}
+    .logo::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .4s}
+    .logo:hover::after{width:100%}
+    .logo-line1{font-family:'Syne',sans-serif;font-weight:800;font-size:21px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);line-height:1}
+    .logo-line2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:13px;letter-spacing:.12em;color:var(--cream);opacity:.5;line-height:1}
+    .logo-line3{font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:var(--mid);margin-top:1px}
+    .nav-links{display:flex;gap:36px;list-style:none}
+    .nav-links a{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);text-decoration:none;opacity:.4;transition:opacity .2s,color .2s;position:relative}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+    .nav-links a:hover{opacity:1;color:var(--gold)}.nav-links a:hover::after{width:100%}
+    .nav-cart{background:none;border:1px solid rgba(201,169,110,.35);color:var(--cream);font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:10px 22px;cursor:none;transition:all .25s;position:relative;overflow:hidden}
+    .nav-cart::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .3s ease}
+    .nav-cart:hover::before{transform:translateX(0)}.nav-cart:hover{color:var(--bg);border-color:var(--gold)}
+    .nav-cart span{position:relative;z-index:1}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 100px;position:relative;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 72% 38%,rgba(201,169,110,.055) 0%,transparent 70%),radial-gradient(ellipse 35% 70% at 8% 82%,rgba(201,169,110,.03) 0%,transparent 60%),linear-gradient(155deg,#0b0b0a 0%,#14120e 50%,#0b0b0a 100%)}
+    .hero-grid{position:absolute;inset:0;opacity:.035;background-image:linear-gradient(var(--cream) 1px,transparent 1px),linear-gradient(90deg,var(--cream) 1px,transparent 1px);background-size:80px 80px}
+    .hero-bg-word{position:absolute;right:-40px;top:50%;transform:translateY(-50%) rotate(90deg);font-family:'Syne',sans-serif;font-weight:800;font-size:220px;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(201,169,110,.05);white-space:nowrap;pointer-events:none;user-select:none}
+    .hero-content{position:relative;z-index:2}
+    .hero-eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.85;margin-bottom:24px;display:flex;align-items:center;gap:14px}
+    .hero-eyebrow::before{content:'';width:36px;height:1px;background:var(--gold);opacity:.5}
+    h1.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(76px,11.5vw,190px);font-weight:300;line-height:.87;letter-spacing:-.02em;margin-bottom:44px}
+    .ht-a{display:block;color:var(--cream)}
+    .ht-b{display:block;font-style:italic;color:var(--gold)}
+    .ht-c{display:block;color:transparent;-webkit-text-stroke:1px rgba(240,234,216,.2)}
+    .hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:40px}
+    .hero-desc{max-width:360px;font-size:15px;line-height:1.8;opacity:.4}
+    .hero-acts{display:flex;gap:14px;align-items:center}
+    .btn-p{background:var(--gold);color:var(--bg);font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;padding:18px 44px;text-decoration:none;cursor:none;display:inline-block;position:relative;overflow:hidden;transition:opacity .3s}
+    .btn-p::after{content:'';position:absolute;inset:0;background:var(--cream);transform:translateX(-101%);transition:transform .35s ease}
+    .btn-p:hover::after{transform:translateX(0)}.btn-p span{position:relative;z-index:1}
+    .btn-g{background:none;border:1px solid rgba(240,234,216,.15);color:var(--cream);font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;padding:18px 36px;text-decoration:none;cursor:none;transition:all .3s;display:inline-block}
+    .btn-g:hover{border-color:var(--gold);color:var(--gold)}
+
+    /* MARQUEE */
+    .mband{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);overflow:hidden;padding:14px 0}
+    .mtrack{display:flex;gap:0;animation:marq 20s linear infinite;width:max-content}
+    .mtrack:hover{animation-play-state:paused}
+    .mi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;letter-spacing:.1em;padding:0 34px;color:var(--mid);white-space:nowrap}
+    .md{color:var(--gold);font-size:22px;align-self:center;line-height:0}
+    @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    /* SHOP */
+    #shop{padding:130px 52px}
+    .sec-hd{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px}
+    .sec-tag{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+    .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,4vw,66px);font-weight:300;line-height:1;color:var(--cream)}
+    .sec-title em{font-style:italic;color:var(--gold)}
+    .products{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+    .pcard{background:var(--bg2);position:relative;overflow:hidden;cursor:none;display:flex;flex-direction:column}
+    .pvisual{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;padding:44px;position:relative;overflow:hidden;background:linear-gradient(140deg,var(--bg2),var(--bg3));transition:background .5s}
+    .pcard:hover .pvisual{background:linear-gradient(140deg,var(--bg3),#1e1c14)}
+    .pcard:hover .tsv{transform:scale(1.05) translateY(-8px)}
+    .tsv{transition:transform .55s ease}
+    .pshine{position:absolute;inset:0;background:radial-gradient(circle at var(--px,50%) var(--py,50%),rgba(201,169,110,.09) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+    .pcard:hover .pshine{opacity:1}
+    .ptag{position:absolute;top:18px;left:18px;background:var(--gold);color:var(--bg);font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 11px;font-weight:700}
+    .ptag.n{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+    .pcta{position:absolute;bottom:0;left:0;right:0;background:var(--gold);color:var(--bg);text-align:center;padding:16px;font-size:9px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);cursor:none;border:none;width:100%;font-family:'Syne',sans-serif}
+    .pcard:hover .pcta{transform:translateY(0)}
+    .pbody{padding:22px 26px 26px;border-top:1px solid var(--line)}
+    .pname{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:8px;color:var(--cream)}
+    .pmeta{display:flex;justify-content:space-between;align-items:center}
+    .pprice{font-size:14px;color:var(--gold);letter-spacing:.05em}
+    .cdots{display:flex;gap:6px}
+    .cdot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,.18);cursor:none}
+
+    /* ABOUT */
+    .about{background:var(--bg2);padding:130px 52px;display:grid;grid-template-columns:.75fr 1.25fr;gap:100px;align-items:center;position:relative;overflow:hidden}
+    .about::before{content:'';position:absolute;top:-120px;right:-120px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(201,169,110,.04) 0%,transparent 70%);pointer-events:none}
+    .logo-monument{display:flex;flex-direction:column;gap:0}
+    .lm1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(52px,7vw,100px);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);line-height:1}
+    .lm2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(38px,5vw,72px);letter-spacing:.06em;color:transparent;-webkit-text-stroke:1px rgba(201,169,110,.28);line-height:1}
+    .lm3{font-size:9px;letter-spacing:.38em;text-transform:uppercase;color:var(--mid);margin-top:14px}
+    .lm-bar{width:50px;height:1px;background:var(--gold);opacity:.35;margin:18px 0}
+    .about-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,2.8vw,38px);font-weight:300;line-height:1.35;color:var(--cream);opacity:.78}
+    .about-quote em{font-style:italic;color:var(--gold);opacity:1}
+    .about-p{font-size:15px;line-height:1.85;opacity:.4;margin-top:28px}
+    .astats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:44px}
+    .astat{background:var(--bg);padding:26px 22px}
+    .asn{font-family:'Cormorant Garamond',serif;font-size:46px;color:var(--gold);line-height:1;font-weight:300}
+    .asl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;opacity:.3;margin-top:4px}
+
+    /* SECURITY STRIP */
+    .sec-strip{background:var(--bg3);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 52px;display:flex;justify-content:center;gap:56px;flex-wrap:wrap}
+    .si{display:flex;align-items:center;gap:9px;font-size:11px;opacity:.35;letter-spacing:.05em}
+    .sico{font-size:15px;color:var(--gold);opacity:.65}
+
+    /* CHECKOUT */
+    #checkout{padding:130px 52px;position:relative;overflow:hidden}
+    #checkout::before{content:'';position:absolute;top:0;left:52px;right:52px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.25}
+    .co-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+    .co-left{position:sticky;top:110px}
+    .osummary{background:var(--bg2);border:1px solid var(--line);padding:38px}
+    .ost{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:28px}
+    .ositem{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+    .osii{width:62px;height:62px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .osin{flex:1}.osin-n{font-size:14px;margin-bottom:4px}.osin-s{font-size:11px;opacity:.35}
+    .osip{font-size:14px;color:var(--gold);align-self:center}
+    .ostotals{padding-top:22px}
+    .osline{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;opacity:.45}
+    .ostotal{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;padding-top:14px;margin-top:6px;border-top:1px solid var(--line);color:var(--gold)}
+
+    /* FORM */
+    .pform{display:flex;flex-direction:column}
+    .hp-f{position:absolute;left:-9999px;top:-9999px;visibility:hidden}
+    .pfsec{margin-bottom:38px}
+    .pfst{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+    .pfst::after{content:'';flex:1;height:1px;background:var(--line)}
+    .pfrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .pfrow3{grid-template-columns:2fr 1fr 1fr}
+    .fld{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+    .fld label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.38}
+    .fld input,.fld select{background:var(--bg2);border:1px solid var(--line);color:var(--cream);padding:13px 15px;font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color .25s;-webkit-appearance:none}
+    .fld input::placeholder{opacity:.22}.fld input:focus{border-color:rgba(201,169,110,.45)}
+    .fld input.err{border-color:var(--red)}.ferr{font-size:10px;color:var(--red);opacity:0;transition:opacity .2s}.ferr.show{opacity:1}
+    .fld select option{background:var(--bg2);color:var(--cream)}
+    .ciw{position:relative}.ciw input{padding-right:78px;width:100%}
+    .cicons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
+    .cic{width:26px;height:17px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:6px;letter-spacing:.08em;opacity:.45}
+    .ptabs{display:flex;gap:1px;margin-bottom:22px;background:var(--line)}
+    .ptab{flex:1;padding:13px;background:var(--bg2);text-align:center;font-size:9px;letter-spacing:.16em;text-transform:uppercase;cursor:none;transition:all .2s;border:1px solid transparent;opacity:.4}
+    .ptab.active{background:var(--bg3);color:var(--gold);border-color:rgba(201,169,110,.28);opacity:1}
+    .ptab:hover:not(.active){opacity:.65}
+    .ppanel{display:none}.ppanel.active{display:block}
+    .tdet{background:var(--bg3);border:1px solid var(--line);padding:28px}
+    .tdt{font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:22px}
+    .tdr{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+    .tdl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;opacity:.38}
+    .tdv{font-size:14px;display:flex;align-items:center;gap:9px}
+    .cbtn{background:none;border:1px solid var(--line);color:var(--cream);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;cursor:none;transition:all .2s}
+    .cbtn:hover{border-color:var(--gold);color:var(--gold)}
+    .tdnote{margin-top:18px;font-size:11px;opacity:.35;line-height:1.65}
+    .pbtn{width:100%;background:var(--gold);color:var(--bg);border:none;padding:20px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.25em;text-transform:uppercase;font-weight:700;cursor:none;margin-top:28px;position:relative;overflow:hidden;transition:opacity .3s}
+    .pbtn::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .55s ease}
+    .pbtn:hover::before{left:140%}.pbtn:disabled{opacity:.35;cursor:not-allowed}
+    .sbadge{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;font-size:10px;opacity:.28}
+
+    /* FOOTER */
+    footer{background:var(--bg2);padding:76px 52px 36px;border-top:1px solid var(--line)}
+    .ftop{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:56px;margin-bottom:56px}
+    .fcol-t{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);opacity:.65;margin-bottom:18px}
+    .flinks{list-style:none}.flinks li{margin-bottom:11px}
+    .flinks a{font-size:13px;opacity:.38;text-decoration:none;color:inherit;transition:opacity .2s,color .2s}
+    .flinks a:hover{opacity:1;color:var(--gold)}
+    .fbot{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;align-items:center;font-size:10px;opacity:.22}
+
+    /* CART */
+    .cart-ov{position:fixed;inset:0;background:rgba(11,11,10,.65);backdrop-filter:blur(6px);z-index:600;opacity:0;pointer-events:none;transition:opacity .3s}
+    .cart-ov.open{opacity:1;pointer-events:all}
+    .cart-dr{position:absolute;right:0;top:0;bottom:0;width:430px;background:var(--bg2);border-left:1px solid var(--line);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+    .cart-ov.open .cart-dr{transform:translateX(0)}
+    .ch{padding:30px 34px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .cht{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300}
+    .cx{background:none;border:none;color:var(--cream);font-size:18px;cursor:none;opacity:.35;transition:opacity .2s}.cx:hover{opacity:1}
+    .cb{flex:1;overflow-y:auto;padding:22px 34px}
+    .ce{text-align:center;opacity:.28;font-size:14px;padding:70px 0}
+    .cir{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+    .cii{width:64px;height:64px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cin{flex:1}.cin-n{font-size:14px;margin-bottom:3px}.cin-s{font-size:11px;opacity:.3}.cin-p{font-size:14px;color:var(--gold);margin-top:5px}
+    .crm{background:none;border:none;color:var(--cream);font-size:14px;opacity:.22;cursor:none;transition:opacity .2s;align-self:flex-start;padding-top:2px}.crm:hover{opacity:.65}
+    .cf{padding:22px 34px;border-top:1px solid var(--line)}
+    .ctr{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:18px;color:var(--gold)}
+    .cobtn{width:100%;background:var(--gold);color:var(--bg);border:none;padding:17px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;cursor:none;transition:opacity .2s}.cobtn:hover{opacity:.82}
+
+    /* MODAL */
+    .mov{position:fixed;inset:0;background:rgba(11,11,10,.88);backdrop-filter:blur(12px);z-index:800;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center}
+    .mov.open{opacity:1;pointer-events:all}
+    .md{background:var(--bg2);border:1px solid var(--line);max-width:500px;width:90%;padding:48px;transform:translateY(18px);transition:transform .3s;position:relative}
+    .mov.open .md{transform:translateY(0)}
+    .mdc{position:absolute;top:18px;right:18px;background:none;border:none;color:var(--cream);font-size:18px;cursor:none;opacity:.35;transition:opacity .2s}.mdc:hover{opacity:1}
+    .msuc{text-align:center;padding:16px 0}.mck{font-size:48px;margin-bottom:18px}
+    .mst{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);margin-bottom:12px}
+    .mss{font-size:14px;opacity:.45;line-height:1.75}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg2);color:var(--cream);border:1px solid var(--line);padding:13px 26px;font-size:12px;letter-spacing:.07em;opacity:0;transition:all .3s;pointer-events:none;z-index:9997;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* RATE LIMIT */
+    #rl-banner{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;text-align:center;padding:12px;font-size:11px;letter-spacing:.1em;z-index:10000}
+
+    /* REVEAL */
+    .rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+    .rv.in{opacity:1;transform:translateY(0)}.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+
+    @media(max-width:960px){
+      nav,nav.scrolled{padding:18px 22px}.nav-links{display:none}
+      .hero{padding:0 22px 72px}
+      #shop,.about,#checkout,footer{padding:80px 22px}
+      .products{grid-template-columns:1fr 1fr}.co-grid{grid-template-columns:1fr}.co-left{position:static}
+      .about{grid-template-columns:1fr}.ftop{grid-template-columns:1fr 1fr}
+      .sec-strip{padding:22px;gap:22px}.fbot{flex-direction:column;gap:8px;text-align:center}
+      .cart-dr{width:100%}.pfrow,.pfrow3{grid-template-columns:1fr}
+      body{cursor:auto}.cursor,.cursor-ring{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<div id="rl-banner">⚠ Too many requests detected. Please wait before trying again.</div>
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="cur-r"></div>
+
+<!-- NAV -->
+<nav id="mnav">
+  <a href="#" class="logo" aria-label="Plain.CO Home">
+    <span class="logo-line1">Plain.CO</span>
+    <span class="logo-line2">Plain and Simple</span>
+    <span class="logo-line3">Est. 2024 · Lagos</span>
+  </a>
+  <ul class="nav-links" role="navigation">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#checkout">Order</a></li>
+  </ul>
+  <button class="nav-cart" onclick="openCart()" aria-label="Open cart">
+    <span>Cart (<span id="cc">0</span>)</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-bg-word" aria-hidden="true">PLAIN.CO</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Plain and Simple</p>
+    <h1 class="hero-title">
+      <span class="ht-a">Wear</span>
+      <span class="ht-b">Plain,</span>
+      <span class="ht-c">Live Simple.</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-desc">Wardrobe essentials stripped of everything unnecessary. Quality you feel from the first wear — plain and simple.</p>
+      <div class="hero-acts">
+        <a href="#shop" class="btn-p"><span>Shop Now →</span></a>
+        <a href="#about" class="btn-g">Our Story</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mband" aria-hidden="true">
+  <div class="mtrack">
+    <span class="mi">Plain and Simple</span><span class="md">·</span>
+    <span class="mi">Premium Essentials</span><span class="md">·</span>
+    <span class="mi">Ethically Made · Lagos</span><span class="md">·</span>
+    <span class="mi">240 GSM Cotton</span><span class="md">·</span>
+    <span class="mi">No Logos. No Noise.</span><span class="md">·</span>
+    <span class="mi">Free Shipping ₦15k+</span><span class="md">·</span>
+    <span class="mi">Plain and Simple</span><span class="md">·</span>
+    <span class="mi">Premium Essentials</span><span class="md">·</span>
+    <span class="mi">Ethically Made · Lagos</span><span class="md">·</span>
+    <span class="mi">240 GSM Cotton</span><span class="md">·</span>
+    <span class="mi">No Logos. No Noise.</span><span class="md">·</span>
+    <span class="mi">Free Shipping ₦15k+</span><span class="md">·</span>
+  </div>
+</div>
+
+<!-- SHOP -->
+<section id="shop" aria-label="Shop">
+  <div class="sec-hd rv">
+    <div>
+      <p class="sec-tag">The Collection</p>
+      <h2 class="sec-title">Plain &amp; <em>Simple</em></h2>
+    </div>
+  </div>
+  <div class="products" role="list">
+    <article class="pcard rv d1" role="listitem">
+      <div class="pvisual" id="pv1">
+        <div class="pshine" id="ps1"></div>
+        <div class="ptag">Bestseller</div>
+        <svg class="tsv" viewBox="0 0 260 310" fill="none" width="72%" aria-hidden="true">
+          <path d="M75 38L28 92L66 110L66 275L194 275L194 110L232 92L185 38C167 72 144 84 130 84C116 84 93 72 75 38Z" fill="#1c1c19" stroke="rgba(201,169,110,.22)" stroke-width="1.3"/>
+          <path d="M100 42C108 59 119 70 130 72C141 70 152 59 160 42" stroke="rgba(201,169,110,.18)" stroke-width="1" fill="none"/>
+          <line x1="130" y1="110" x2="130" y2="265" stroke="rgba(201,169,110,.05)" stroke-width="1"/>
+        </svg>
+        <button class="pcta" onclick="addToCart('Classic Crew',12500,'M')">Add to Cart</button>
+      </div>
+      <div class="pbody">
+        <div class="pname">Classic Crew</div>
+        <div class="pmeta">
+          <span class="pprice">₦12,500</span>
+          <div class="cdots">
+            <div class="cdot" style="background:#f7f4ec" title="White"></div>
+            <div class="cdot" style="background:#2a2a28" title="Black"></div>
+            <div class="cdot" style="background:#8b7355" title="Sand"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+    <article class="pcard rv d2" role="listitem">
+      <div class="pvisual" id="pv2">
+        <div class="pshine" id="ps2"></div>
+        <svg class="tsv" viewBox="0 0 260 320" fill="none" width="72%" aria-hidden="true">
+          <path d="M65 35L15 95L58 116L58 290L202 290L202 116L245 95L195 35C175 74 148 88 130 88C112 88 85 74 65 35Z" fill="#1c1c19" stroke="rgba(201,169,110,.22)" stroke-width="1.3"/>
+          <path d="M96 39C105 59 118 72 130 74C142 72 155 59 164 39" stroke="rgba(201,169,110,.18)" stroke-width="1" fill="none"/>
+        </svg>
+        <button class="pcta" onclick="addToCart('Oversized Drop',14500,'L')">Add to Cart</button>
+      </div>
+      <div class="pbody">
+        <div class="pname">Oversized Drop</div>
+        <div class="pmeta">
+          <span class="pprice">₦14,500</span>
+          <div class="cdots">
+            <div class="cdot" style="background:#f7f4ec" title="White"></div>
+            <div class="cdot" style="background:#6b7280" title="Slate"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+    <article class="pcard rv d3" role="listitem">
+      <div class="pvisual" id="pv3">
+        <div class="pshine" id="ps3"></div>
+        <div class="ptag n">New</div>
+        <svg class="tsv" viewBox="0 0 260 290" fill="none" width="72%" aria-hidden="true">
+          <path d="M78 38L32 86L68 104L68 265L192 265L192 104L228 86L182 38C166 66 145 78 130 78C115 78 94 66 78 38Z" fill="#1c1c19" stroke="rgba(201,169,110,.22)" stroke-width="1.3"/>
+          <path d="M104 42L130 68L156 42" stroke="rgba(201,169,110,.22)" stroke-width="1.3" fill="none"/>
+        </svg>
+        <button class="pcta" onclick="addToCart('Clean V-Neck',13000,'M')">Add to Cart</button>
+      </div>
+      <div class="pbody">
+        <div class="pname">Clean V-Neck</div>
+        <div class="pmeta">
+          <span class="pprice">₦13,000</span>
+          <div class="cdots">
+            <div class="cdot" style="background:#f7f4ec" title="White"></div>
+            <div class="cdot" style="background:#2a2a28" title="Black"></div>
+            <div class="cdot" style="background:#c8b89a" title="Cream"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about rv" id="about" aria-label="About">
+  <div class="logo-monument">
+    <span class="lm1">Plain</span>
+    <span class="lm2">.CO</span>
+    <div class="lm-bar"></div>
+    <span class="lm3">Plain and Simple · Est. 2024</span>
+  </div>
+  <div>
+    <p class="about-quote">We make <em>essentials</em> worth owning — clothes so well made, you stop looking for anything else.</p>
+    <p class="about-p">Plain.CO is built on one belief: great clothing doesn't need decoration. It needs craft. We source ring-spun combed cotton, pre-wash every piece, and cut each garment to fit exactly right — structured where it counts, relaxed where it matters. Plain and simple.</p>
+    <div class="astats">
+      <div class="astat"><div class="asn">240</div><div class="asl">GSM Weight</div></div>
+      <div class="astat"><div class="asn">100%</div><div class="asl">Cotton</div></div>
+      <div class="astat"><div class="asn">0</div><div class="asl">Logos / Prints</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY STRIP -->
+<div class="sec-strip" aria-label="Security assurances">
+  <div class="si"><span class="sico">🔒</span> 256-bit SSL Encrypted</div>
+  <div class="si"><span class="sico">🛡</span> PCI DSS Compliant</div>
+  <div class="si"><span class="sico">✓</span> Verified Secure Checkout</div>
+  <div class="si"><span class="sico">↩</span> 30-Day Returns</div>
+  <div class="si"><span class="sico">📦</span> Tracked Shipping</div>
+</div>
+
+<!-- CHECKOUT -->
+<section id="checkout" aria-label="Checkout">
+  <div class="sec-hd rv">
+    <div>
+      <p class="sec-tag">Secure Checkout</p>
+      <h2 class="sec-title">Complete <em>Your Order</em></h2>
+    </div>
+  </div>
+  <div class="co-grid">
+    <div class="co-left rv">
+      <div class="osummary">
+        <h3 class="ost">Order Summary</h3>
+        <div id="os-items">
+          <div class="ositem">
+            <div class="osii"><svg viewBox="0 0 50 60" width="28" fill="none"><path d="M14 7L4 18l8 4v31h26V22l8-4L46 7c-4 7-9 11-14 11S18 14 14 7Z" fill="#1c1c19" stroke="rgba(201,169,110,.3)" stroke-width="1"/></svg></div>
+            <div class="osin"><div class="osin-n">Classic Crew — White / M</div><div class="osin-s">Qty: 1</div></div>
+            <span class="osip">₦12,500</span>
+          </div>
+        </div>
+        <div class="ostotals">
+          <div class="osline"><span>Subtotal</span><span id="sub-t">₦0</span></div>
+          <div class="osline"><span>Shipping</span><span id="ship-t">Calculated at checkout</span></div>
+          <div class="osline"><span>Tax (7.5% VAT)</span><span id="tax-t">₦0</span></div>
+          <div class="ostotal"><span>Total</span><span id="ord-t">₦0</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="rv d1">
+      <form id="pf" novalidate autocomplete="on" spellcheck="false">
+        <input class="hp-f" type="text" name="website" id="hp_w" tabindex="-1" autocomplete="off"/>
+
+        <div class="pfsec">
+          <div class="pfst">Contact Information</div>
+          <div class="pfrow">
+            <div class="fld"><label for="fn">First Name</label><input type="text" id="fn" name="firstname" placeholder="Amara" autocomplete="given-name" required/><span class="ferr" id="e-fn">Enter your first name</span></div>
+            <div class="fld"><label for="ln">Last Name</label><input type="text" id="ln" name="lastname" placeholder="Okafor" autocomplete="family-name" required/><span class="ferr" id="e-ln">Enter your last name</span></div>
+          </div>
+          <div class="fld"><label for="em">Email</label><input type="email" id="em" name="email" placeholder="amara@email.com" autocomplete="email" required/><span class="ferr" id="e-em">Enter a valid email address</span></div>
+          <div class="fld"><label for="ph">Phone</label><input type="tel" id="ph" name="phone" placeholder="+234 800 000 0000" autocomplete="tel" required/><span class="ferr" id="e-ph">Enter a valid phone number</span></div>
+        </div>
+
+        <div class="pfsec">
+          <div class="pfst">Delivery Address</div>
+          <div class="fld"><label for="adr">Street Address</label><input type="text" id="adr" name="address" placeholder="12 Victoria Island Road" autocomplete="street-address" required/><span class="ferr" id="e-adr">Enter your address</span></div>
+          <div class="pfrow">
+            <div class="fld"><label for="cty">City</label><input type="text" id="cty" name="city" placeholder="Lagos" autocomplete="address-level2" required/></div>
+            <div class="fld"><label for="sta">State</label>
+              <select id="sta" name="state" autocomplete="address-level1">
+                <option value="">Select State</option>
+                <option>Lagos</option><option>Abuja (FCT)</option><option>Rivers</option>
+                <option>Kano</option><option>Oyo</option><option>Kaduna</option>
+                <option>Enugu</option><option>Delta</option><option>Ogun</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="pfsec">
+          <div class="pfst">Payment Method</div>
+          <div class="ptabs" role="tablist">
+            <div class="ptab active" role="tab" onclick="stab('card',this)">💳 Card</div>
+            <div class="ptab" role="tab" onclick="stab('xfer',this)">🏦 Transfer</div>
+            <div class="ptab" role="tab" onclick="stab('ussd',this)">📱 USSD</div>
+          </div>
+
+          <div class="ppanel active" id="pp-card">
+            <div class="fld"><label for="cnum">Card Number</label>
+              <div class="ciw"><input type="text" id="cnum" name="cardnumber" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number" inputmode="numeric" required/>
+                <div class="cicons"><div class="cic">VISA</div><div class="cic">MC</div></div>
+              </div>
+              <span class="ferr" id="e-cnum">Enter a valid card number</span>
+            </div>
+            <div class="fld"><label for="cnm">Name on Card</label><input type="text" id="cnm" name="ccname" placeholder="AMARA OKAFOR" autocomplete="cc-name" required/><span class="ferr" id="e-cnm">Enter name on card</span></div>
+            <div class="pfrow pfrow3">
+              <div class="fld"><label for="exp">Expiry</label><input type="text" id="exp" name="cc-exp" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" required inputmode="numeric"/><span class="ferr" id="e-exp">Invalid expiry</span></div>
+              <div class="fld"><label for="cvv">CVV</label><input type="text" id="cvv" name="cc-csc" placeholder="•••" maxlength="4" autocomplete="cc-csc" required inputmode="numeric"/><span class="ferr" id="e-cvv">Invalid CVV</span></div>
+            </div>
+          </div>
+
+          <div class="ppanel" id="pp-xfer">
+            <div class="tdet">
+              <div class="tdt">Bank Transfer Details</div>
+              <div class="tdr"><span class="tdl">Bank</span><span class="tdv">Guaranty Trust Bank (GTB)</span></div>
+              <div class="tdr"><span class="tdl">Account Name</span><span class="tdv">Plain.CO Limited</span></div>
+              <div class="tdr"><span class="tdl">Account Number</span><span class="tdv">0123456789 <button type="button" class="cbtn" onclick="cpyTxt('0123456789',this)">Copy</button></span></div>
+              <div class="tdr"><span class="tdl">Sort Code</span><span class="tdv">058-150-XXX</span></div>
+              <p class="tdnote">After transferring, click "Confirm Order". We verify and confirm within 30 minutes. Use your email address as the payment narration.</p>
+            </div>
+          </div>
+
+          <div class="ppanel" id="pp-ussd">
+            <div class="tdet">
+              <div class="tdt">Pay via USSD</div>
+              <div class="tdr"><span class="tdl">GTB</span><span class="tdv">*737*amount*AccountNo#</span></div>
+              <div class="tdr"><span class="tdl">First Bank</span><span class="tdv">*894*amount*AccountNo#</span></div>
+              <div class="tdr"><span class="tdl">Access Bank</span><span class="tdv">*901*amount*AccountNo#</span></div>
+              <div class="tdr"><span class="tdl">Zenith Bank</span><span class="tdv">*966*amount*AccountNo#</span></div>
+              <p class="tdnote">Replace "amount" and "AccountNo" with your total and our account number (0123456789). Click Confirm Order after payment.</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="pbtn" id="pbtn" onclick="submitOrder()">🔒 Place Secure Order</button>
+        <div class="sbadge">🔒 Your payment is encrypted and secure</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ftop">
+    <div>
+      <div class="logo-line1" style="font-size:20px">Plain.CO</div>
+      <div class="logo-line2" style="font-size:13px;margin-top:4px">Plain and Simple</div>
+      <p style="font-size:13px;opacity:.32;margin-top:12px;line-height:1.7">Essentials. Made well.<br>Plain and simple.</p>
+    </div>
+    <div><div class="fcol-t">Shop</div><ul class="flinks"><li><a href="#shop">Classic Crew</a></li><li><a href="#shop">Oversized Drop</a></li><li><a href="#shop">Clean V-Neck</a></li></ul></div>
+    <div><div class="fcol-t">Help</div><ul class="flinks"><li><a href="#">Shipping &amp; Returns</a></li><li><a href="#">Size Guide</a></li><li><a href="#">Care Instructions</a></li><li><a href="#">Contact Us</a></li></ul></div>
+    <div><div class="fcol-t">Connect</div><ul class="flinks"><li><a href="#">Instagram</a></li><li><a href="#">Twitter / X</a></li><li><a href="#">WhatsApp</a></li><li><a href="#">hello@plain.co</a></li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2024 Plain.CO · All rights reserved.</span><span>Lagos, Nigeria · Plain and Simple</span></div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-ov" id="c-ov">
+  <div class="cart-dr" role="dialog" aria-label="Shopping cart">
+    <div class="ch"><span class="cht">Your Cart</span><button class="cx" onclick="closeCart()" aria-label="Close cart">✕</button></div>
+    <div class="cb" id="cb"><p class="ce" id="c-empty">Your cart is empty.</p></div>
+    <div class="cf" id="c-foot" style="display:none">
+      <div class="ctr"><span>Total</span><span id="c-tot">₦0</span></div>
+      <button class="cobtn" onclick="closeCart();goCheckout()">Proceed to Checkout →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="mov" id="suc-modal">
+  <div class="md">
+    <button class="mdc" onclick="cModal('suc-modal')" aria-label="Close">✕</button>
+    <div class="msuc"><div class="mck">✅</div><div class="mst">Order Placed!</div><p class="mss">Thank you. You'll receive a confirmation email shortly. We dispatch within 24–48 hours.</p></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<script>
+/* ===== SECURITY SYSTEM ===== */
+
+// Console warning
+console.log('%c⚠ STOP','color:red;font-size:48px;font-weight:bold;');
+console.log('%cThis browser feature is for developers only. Entering commands here could compromise your security.','color:#c9a96e;font-size:14px;');
+console.log('%cIf anyone told you to paste something here — they are trying to scam you.','color:#888;font-size:13px;');
+
+// Anti-iframe (clickjacking)
+if(window.self !== window.top){document.body.innerHTML='<p style="padding:20px;color:red;font-family:monospace">This page cannot be loaded in a frame.</p>';}
+
+// CSRF token
+const csrf = Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join('');
+
+// Rate limiter
+const rl=(()=>{const a=[];const W=60000,M=5;return{try(){const n=Date.now();while(a.length&&n-a[0]>W)a.shift();a.push(n);return a.length<=M;},reset(){a.length=0;}}})();
+
+// Bot detection: honeypot
+const isBot=()=>document.getElementById('hp_w').value!=='';
+
+// Submission timing (bots are too fast)
+const loadT=Date.now();
+
+// Input sanitizer
+const san=s=>String(s).replace(/[<>'"`;\\]/g,'').replace(/javascript:/gi,'').replace(/on\w+\s*=/gi,'').trim().slice(0,300);
+
+// Right-click block on payment section
+document.getElementById('pf')?.addEventListener('contextmenu',e=>e.preventDefault());
+
+// Card paste block
+document.getElementById('cnum')?.addEventListener('paste',e=>{
+  const p=(e.clipboardData||window.clipboardData).getData('text');
+  if(p.replace(/\s/g,'').length>19){e.preventDefault();toast('Please type your card number manually.');}
+});
+
+/* ===== CURSOR ===== */
+const cur=document.getElementById('cur');
+const curR=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.11;ry+=(my-ry)*.11;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.pcard,.ptab,.cdot').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.classList.add('hv');curR.classList.add('hv');});
+  el.addEventListener('mouseleave',()=>{cur.classList.remove('hv');curR.classList.remove('hv');});
+});
+
+/* ===== CARD SHINE ===== */
+['pv1','pv2','pv3'].forEach((id,i)=>{
+  const el=document.getElementById(id);
+  const sh=document.getElementById('ps'+(i+1));
+  el?.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect();
+    sh.style.setProperty('--px',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    sh.style.setProperty('--py',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+  });
+});
+
+/* ===== NAV SCROLL ===== */
+window.addEventListener('scroll',()=>document.getElementById('mnav').classList.toggle('scrolled',scrollY>55),{passive:true});
+
+/* ===== REVEAL ===== */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}}),{threshold:.07});
+document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+
+/* ===== CARD FORMATTING ===== */
+document.getElementById('cnum')?.addEventListener('input',function(){
+  let v=this.value.replace(/\D/g,'').slice(0,16);
+  this.value=v.replace(/(.{4})/g,'$1 ').trim();
+});
+document.getElementById('exp')?.addEventListener('input',function(){
+  let v=this.value.replace(/\D/g,'');
+  if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2,4);
+  this.value=v;
+});
+document.getElementById('cvv')?.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,4);});
+
+/* ===== PAYMENT TABS ===== */
+function stab(id,el){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ppanel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pp-'+id).classList.add('active');
+}
+
+/* ===== CART ===== */
+let cart=[];
+function addToCart(name,price,size){
+  const ex=cart.find(i=>i.name===name&&i.size===size);
+  ex?ex.qty++:cart.push({name,price,size,qty:1});
+  renderCart();openCart();toast(name+' added to cart');
+}
+function renderCart(){
+  const count=cart.reduce((a,i)=>a+i.qty,0);
+  document.getElementById('cc').textContent=count;
+  const body=document.getElementById('cb');
+  const emEl=document.getElementById('c-empty');
+  const foot=document.getElementById('c-foot');
+  if(!cart.length){emEl.style.display='block';foot.style.display='none';body.innerHTML='';body.appendChild(emEl);return;}
+  emEl.style.display='none';foot.style.display='block';body.innerHTML='';
+  let total=0;
+  cart.forEach((item,idx)=>{
+    total+=item.price*item.qty;
+    const d=document.createElement('div');d.className='cir';
+    d.innerHTML=`<div class="cii"><svg viewBox="0 0 50 60" width="26" fill="none"><path d="M14 7L4 18l8 4v31h26V22l8-4L46 7c-4 7-9 11-14 11S18 14 14 7Z" fill="#1c1c19" stroke="rgba(201,169,110,.3)" stroke-width="1"/></svg></div><div class="cin"><div class="cin-n">${san(item.name)}</div><div class="cin-s">Size: ${san(item.size)} · Qty: ${item.qty}</div><div class="cin-p">₦${(item.price*item.qty).toLocaleString()}</div></div><button class="crm" onclick="rmCart(${idx})" aria-label="Remove">✕</button>`;
+    body.appendChild(d);
+  });
+  document.getElementById('c-tot').textContent='₦'+total.toLocaleString();
+  updSummary(total);
+}
+function rmCart(i){cart.splice(i,1);renderCart();}
+function openCart(){document.getElementById('c-ov').classList.add('open');}
+function closeCart(){document.getElementById('c-ov').classList.remove('open');}
+document.getElementById('c-ov').addEventListener('click',function(e){if(e.target===this)closeCart();});
+function goCheckout(){document.getElementById('checkout').scrollIntoView({behavior:'smooth'});}
+
+function updSummary(sub){
+  const ship=sub>=15000?0:1500;
+  const tax=Math.round(sub*.075);
+  const tot=sub+ship+tax;
+  document.getElementById('sub-t').textContent='₦'+sub.toLocaleString();
+  document.getElementById('ship-t').textContent=ship===0?'Free':'₦'+ship.toLocaleString();
+  document.getElementById('tax-t').textContent='₦'+tax.toLocaleString();
+  document.getElementById('ord-t').textContent='₦'+tot.toLocaleString();
+}
+
+/* ===== VALIDATION ===== */
+function showE(id,show){
+  document.getElementById('e-'+id)?.classList.toggle('show',show);
+  document.getElementById(id)?.classList.toggle('err',show);
+  return show;
+}
+function validate(){
+  if(isBot())return false;
+  if(Date.now()-loadT<3000){toast('Please complete all fields carefully.');return false;}
+  let ok=true;
+  const g=id=>san(document.getElementById(id)?.value||'');
+  if(g('fn').length<2)ok=showE('fn',true)&&false;else showE('fn',false);
+  if(g('ln').length<2)ok=showE('ln',true)&&false;else showE('ln',false);
+  if(!g('em').match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))ok=showE('em',true)&&false;else showE('em',false);
+  if(g('ph').replace(/\D/g,'').length<10)ok=showE('ph',true)&&false;else showE('ph',false);
+  if(g('adr').length<5)ok=showE('adr',true)&&false;else showE('adr',false);
+  if(document.querySelector('.ptab.active')?.textContent?.includes('Card')){
+    const cn=document.getElementById('cnum')?.value.replace(/\s/g,'');
+    if(!cn||cn.length!==16||!/^\d+$/.test(cn))ok=showE('cnum',true)&&false;else showE('cnum',false);
+    if(g('cnm').length<3)ok=showE('cnm',true)&&false;else showE('cnm',false);
+    if(!g('exp').match(/^\d{2}\s*\/\s*\d{2}$/))ok=showE('exp',true)&&false;else showE('exp',false);
+    if(g('cvv').length<3)ok=showE('cvv',true)&&false;else showE('cvv',false);
+  }
+  return ok;
+}
+
+/* ===== SUBMIT ===== */
+function submitOrder(){
+  if(!rl.try()){
+    document.getElementById('rl-banner').style.display='block';
+    setTimeout(()=>{document.getElementById('rl-banner').style.display='none';rl.reset();},10000);
+    return;
+  }
+  if(!cart.length){toast('Add items to your cart first!');document.getElementById('shop').scrollIntoView({behavior:'smooth'});return;}
+  if(!validate()){toast('Please fix the errors above.');return;}
+  const btn=document.getElementById('pbtn');
+  btn.disabled=true;btn.textContent='⏳ Processing...';
+  // In production: POST to payment server with csrf token
+  // Never log real card data — intentionally omitted here
+  setTimeout(()=>{
+    btn.disabled=false;btn.textContent='🔒 Place Secure Order';
+    cart=[];renderCart();oModal('suc-modal');
+  },2200);
+}
+
+/* ===== MODALS ===== */
+function oModal(id){document.getElementById(id).classList.add('open');}
+function cModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+/* ===== COPY ===== */
+function cpyTxt(t,btn){navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied!';btn.style.color='var(--gold)';setTimeout(()=>{btn.textContent=o;btn.style.color='';},2000);});}
+
+/* ===== TOAST ===== */
+let tT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ===== INIT ===== */
+updSummary(0);
+</script>
+</body>
+</html>
